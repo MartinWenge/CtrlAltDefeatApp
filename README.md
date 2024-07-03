@@ -17,14 +17,20 @@ Requirements for the software and other tools to build, test and push
 ### Installing
 
 * clone the repository
+    ```bash
     git clone https://github.com/MartinWenge/CtrlAltDefeatApp.git
+    ```
 * add your Azure DevOps username and PAT providing access in [appsettings](appsettings.json)
+    ```json
     "AzureDevOpsSettings":{
         "Username": "<add Azure DevOps username here>",
         "Token": "<add Azure DevOps PAT here>"
     },
+    ```
 * run the application
+    ``` bash
     dotnet run
+    ```
 
 ## Authors
 
@@ -32,12 +38,7 @@ Requirements for the software and other tools to build, test and push
   - Tom Donath
   - [Martin Wengenmayr](https://github.com/MartinWenge)
 
-See also the list of
-[contributors](https://github.com/PurpleBooth/a-good-readme-template/contributors)
-who participated in this project.
-
 ## License
 
-This project is licensed under the [CC0 1.0 Universal](LICENSE.md)
-Creative Commons License - see the [LICENSE.md](LICENSE.md) file for
-details
+This project is licensed under the [MIT license](LICENSE.md)
+
