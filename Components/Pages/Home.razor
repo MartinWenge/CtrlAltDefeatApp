@@ -1,0 +1,186 @@
+﻿
+@using Microsoft.AspNetCore.Components
+
+@using System.Globalization;
+
+@page "/home/{UserId}"
+
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<MudStack Style="height: 100% ">
+    <MudPaper Class="pa-3" >
+        <MudGrid Spacing=2 Justify="Justify.Center" >
+            <MudItem xs="3" Style="display: flex; justify-content: center;">
+                <MudStack Class="pa-8">
+                    <MudAvatar Style="align-items: center;" Size="Size.Large" Color="Color.Primary">@initials</MudAvatar>
+                        @if(currentUser != null){
+                                <MudText Typo="Typo.h5">@currentUser.Username</MudText>
+                        }
+                </MudStack>
+            </MudItem>
+        
+            <MudItem xs="3" >
+                @if(currentUser != null){
+                    <MudStack Row="true">
+                        <MudText Class="d-flex align-center justify-center mud-width-full py-8" Typo="Typo.h6">Dein Punktestand:</MudText>
+                        <MudText Class="d-flex align-center justify-center mud-width-full py-8" Color="Color.Primary" Typo="Typo.h6">@currentUser.CurrentXP XP</MudText>
+                    </MudStack>
+                    @if(xpForNextLevel != null){
+                        <MudProgressLinear Class="d-flex align-center justify-center mud-width-full py-2"  Color="Color.Tertiary" Value="@currentUser.CurrentXP" Min="0" Max="@xpForNextLevel" />
+                    }
+                }
+            </MudItem>
+        
+            <MudItem xs="2">
+                @if(currentUser != null){
+                <MudStack Row="true">    
+                    <MudText Class="d-flex align-center justify-center mud-width-full py-8" Typo="Typo.h6">Dein Level:</MudText>
+                    <MudText Class="d-flex align-center justify-center mud-width-full py-8" Color="Color.Primary" Typo="Typo.h6">@currentUser.Level</MudText>
+                </MudStack>
+                }
+            </MudItem>
+
+             <MudItem xs="4">
+                @if(currentUser != null){
+                <MudStack Row="true">    
+                    <MudText Class="d-flex align-center justify-center mud-width-full py-8" Typo="Typo.h6">Durchschnittl. Genauigkeit:</MudText>
+                    <MudText Class="d-flex align-center justify-center mud-width-full py-8" Color="Color.Primary" Typo="Typo.h6">@(Math.Round(currentUser.currentAverage, 4).ToString("0.00")) %</MudText>
+                </MudStack>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if(currentUser.ConfirmNewXP){
+        <MudText Class="mt-4">Du hast neue XP bekommen: Von dir geschätzte Workitems wurden abgeschlossen.</MudText>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="resetConfirmNewXP">Hurra, da freue ich mich</MudButton>
+    }
+    
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Schätzungen abgeben" Icon="@Icons.Material.Filled.FormatListBulleted" Title="Favorite">
+                <MudPaper Class="pa-3">
+                    <MudExpansionPanels MultiExpansion="true">
+                        @if(iterations != null){
+                            @foreach (var iteration in iterations){
+                                <MudExpansionPanel Text=@($"Sprint: {iteration}")>
+                                <MudStack Row="true">
+                                @foreach (var workItem in estimateableWorkitems.Where(w => w.IterationPath == iteration && w.WorkItemType == "Task"))
+                                {
+                                    <MudChip OnClick="@(() => OnChipClicked(workItem))" Variant="Variant.Filled" Color="Color.Success" Class="m-1" Icon="@Icons.Material.Filled.AddToPhotos">@workItem.Title</MudChip>
+                                } 
+                                </MudStack>
+                                <MudStack Row="true">
+                                @foreach (var workItem in estimateableWorkitems.Where(w => w.IterationPath == iteration && w.WorkItemType == "Bug"))
+                                {
+                                    <MudChip OnClick="@(() => OnChipClicked(workItem))" Variant="Variant.Filled" Color="Color.Error" Class="m-1" Icon="@Icons.Material.Filled.Adb">@workItem.Title</MudChip>
+                                } 
+                                </MudStack>
+                                <MudStack Row="true">
+                                @foreach (var workItem in estimateableWorkitems.Where(w => w.IterationPath == iteration && (w.WorkItemType != "Task" && w.WorkItemType != "Bug")))
+                                {
+                                    <MudChip OnClick="@(() => OnChipClicked(workItem))" Variant="Variant.Filled" Color="Color.Dark" Class="m-1" Icon="@Icons.Material.Filled.Extension">@workItem.Title</MudChip>
+                                }
+                                </MudStack>
+                            </MudExpansionPanel>
+                        }
+                    }
+                    
+                    </MudExpansionPanels>
+                </MudPaper>
+        </MudTabPanel>
+        <MudTabPanel Text="Highscore" Icon="@Icons.Material.Filled.BarChart" Title="Favorite">
+
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudText Typo="Typo.h6">Highscore nach XP</MudText>
+                    <MudSimpleTable Style="overflow-x: auto;">
+                        <thead>
+                            <tr>
+                                <th>Platz</th>
+                                <th>User</th>
+                                <th>XP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < highscoreListByAverage.Count; i++)
+                            {
+                                <tr>
+                                    @if(i == 0){
+                                        <td>
+                                        @(i+1)
+                                        <MudIcon Icon="@Icons.Material.Filled.Celebration" Color="Color.Success" />
+                                        </td>
+                                    }
+                                    else{
+                                        <td>@(i+1)</td>
+                                    }
+                                    <td>@highscoreListByXP[i].Username ( @highscoreListByXP[i].Level )</td>
+                                    <td>@highscoreListByXP[i].CurrentXP</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudItem>
+                <MudItem xs="6">
+                <MudText Typo="Typo.h6">Highscore nach Genauigkeit</MudText>
+                  <MudSimpleTable Style="overflow-x: auto;">
+                        <thead>
+                            <tr>
+                                <th>Platz</th>
+                                <th>User</th>
+                                <th>Durchschnittl. Genauigkeit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < highscoreListByAverage.Count; i++)
+                            {
+                                <tr>
+                                    @if(i == 0){
+                                        <td>
+                                        @(i+1)
+                                        <MudIcon Icon="@Icons.Material.Filled.Celebration" Color="Color.Success" />
+                                        </td>
+                                    }
+                                    else{
+                                        <td>@(i+1)</td>
+                                    }
+                                    <td>@highscoreListByAverage[i].Username ( @highscoreListByXP[i].Level )</td>
+                                    <td>@highscoreListByAverage[i].currentAverage %</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudItem>
+
+        </MudGrid>
+            
+           
+        </MudTabPanel>
+        <MudTabPanel Text="Meine Schätzungen" Icon="@Icons.Material.Filled.AccountCircle" Title="Favorite">
+            <MudSimpleTable Style="overflow-x: auto;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Realer Aufwand</th>
+                                <th>Meine Schätzung</th>
+                                <th>gewonnene XP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var estimate in userEstimates){
+                                <tr>
+                                    <td>@estimate.Id</td>
+                                    <td>@estimate.RealEffort</td>
+                                    <td>@estimate.EstimatedTime</td>
+                                    <td>@(GetWonXp(estimate.EstimatedTime, estimate.RealEffort).ToString())</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+        </MudTabPanel>
+    </MudTabs>
+    
+</MudStack>

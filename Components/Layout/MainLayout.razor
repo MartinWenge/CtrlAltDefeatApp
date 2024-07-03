@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemingProvider />
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudText Typo="Typo.h5" Class="ml-3">CtrlAltDefeatEstimater 2024</MudText>
+        <MudSpacer />
+        @if(NavigationManager.Uri != NavigationManager.BaseUri) {
+            <NavLink href="/" style="color: aliceblue;">
+            <MudStack Row="true" Class="align-center">        
+                <MudIcon Icon="@Icons.Material.Filled.Logout" />
+                <MudText Typo="Typo.h6" Align="Align.Center" >Logout</MudText>
+            </MudStack>
+        </NavLink>
+        }
+    </MudAppBar>
+    <MudMainContent Class="mt-16 pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code{
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+}

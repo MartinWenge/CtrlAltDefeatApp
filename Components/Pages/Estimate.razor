@@ -1,0 +1,75 @@
+﻿@page "/estimate/{userId}/{workItemId}"
+@rendermode InteractiveServer
+@inject ISnackbar Snackbar
+
+<PageTitle>Estimate</PageTitle>
+
+<div style="display: flex; justify-content: center;50vw; flex-direction: column;align-items: center; margin: auto;">
+
+@if(showFirework){
+    <MudContainer Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 50px; height: 100vh;">
+        <MudCard Elevation="4" Style="width: 350px;" >
+            <MudCardContent Style="display:flex; flex-direction: column; align-items: center">
+                    <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Color="Color.Primary" Style="font-size: 4rem;" />
+                    <MudText Typo="Typo.h5">Danke @currentUser.Username!</MudText>
+                    <MudText Class="mt-8">Du bekommst @newXP XP!</MudText>
+                    <MudText Class="mt-4">Dein aktueller Stand: @currentUser.CurrentXP / @nextLevelXp XP</MudText>
+                    @if(nextLevelXp != null){
+                        <MudProgressLinear Class="mt-4" Striped="true" Color="Color.Tertiary" Value="@currentUser.CurrentXP" Min="0" Max="@nextLevelXp" />
+                    }
+                    <MudImage Src="https://media.tenor.com/mKfeCtD5EukAAAAM/the-office-the.gif" Width="200" Alt="GOT XP" Elevation="25" Class="rounded-lg ma-4"/>
+                    @if(showNewLevel){
+                        <MudText Align="Align.Center" Typo="Typo.h5">WOW! Du hast ein neues Level erreicht:<br></MudText>
+                        <MudText Class="mt-2" Align="Align.Center" Color="Color.Primary" Typo="Typo.h4"> @currentUser.Level</MudText>
+                    }
+            </MudCardContent>
+            <MudCardActions>                
+                <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Outlined" @onclick="NavigateToHome">Weiter</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudContainer>
+
+
+
+}else{
+    @if(workItemEstimateable && currentWorkItem != null){
+
+        <EditForm Model=@currentEstimate OnValidSubmit="EstimateWorkitem">
+            <MudCard Elevation="4" Style="width: 350px;">
+            <MudCardMedia Image="https://www.aztechit.co.uk/hubfs/azure-social-image.jpg" Height="200" />
+            <MudCardContent>
+                <MudText Typo="Typo.h5">@currentWorkItem.Title</MudText>
+                <MudText Class="mt-4" Typo="Typo.body2">@(new MarkupString(currentWorkItem.Description))</MudText>
+                <MudSlider Class="mt-8" @bind-Value="currentEstimate.EstimatedTime" Size="Size.Medium" Min="0.25" Max="24" Step="0.25"></MudSlider>
+                <MudNumericField Class="mt-1"  @bind-Value="currentEstimate.EstimatedTime" Label="Geschätzer Aufwand in h" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.HourglassBottom" AdornmentColor="Color.Primary" Min="0.25" Step="0.25" Validation="@ValidateEstimatedTime"></MudNumericField>
+                <MudContainer Style="height: 70px; padding-top:10px">
+                @if (messages.Any(m => currentEstimate.EstimatedTime >= m.Key.Item1 && currentEstimate.EstimatedTime < m.Key.Item2))
+                {
+                    var messageList = messages.First(m => currentEstimate.EstimatedTime >= m.Key.Item1 && currentEstimate.EstimatedTime < m.Key.Item2).Value;
+                    var randomIndex = random.Next(0, messageList.Count);
+                    <MudText Align="Align.Center">@messageList[randomIndex]</MudText>
+                }
+                </MudContainer>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Color="Color.Primary" Variant="Variant.Text" @onclick="NavigateToHome">Zurück</MudButton>
+                <MudSpacer />
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Schätzung abgeben</MudButton>
+            </MudCardActions>
+        </MudCard>
+        </EditForm>
+    } else {
+        <MudCard Elevation="4" Style="width: 350px;">
+            <MudCardMedia Image="https://cdn.pixabay.com/photo/2014/04/05/13/05/boy-317041_640.jpg" Height="200" />
+            <MudCardContent>
+                <MudText Align="Align.Center" Typo="Typo.h5">Die Aufgabe wurde mittlerweile angefangen... </MudText>
+                <MudText Class="mt-4" Align="Align.Center" Typo="Typo.h5">... oder sogar abgeschlossen </MudText>
+            </MudCardContent>
+            <MudCardActions>                
+                <MudButton FullWidth="true" Color="Color.Primary" Variant="Variant.Outlined" @onclick="NavigateToHome">Zurück</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+}
+
+</div>

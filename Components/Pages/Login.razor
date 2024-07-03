@@ -1,0 +1,32 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@using ctrlAltDefeatApp.Data.DatabaseContext
+@using Microsoft.EntityFrameworkCore
+
+
+<MudContainer Style="display: flex; justify-content: center; align-items: flex-start; margin-top: 50px; height: 100vh;">
+<EditForm Model=@loginModel OnValidSubmit="UserLogin">
+
+                <MudCard Elevation="4" Style="width: 350px;">
+                <MudText Typo="Typo.h1" Align="Align.Center">Hallo!</MudText>
+                <MudText Typo="Typo.h5" Align="Align.Center" Color="Color.Primary">@(!registerNewUser ? "Melde dich bitte an" : "Registriere dich jetzt")</MudText>
+                <MudCardContent>
+                    <MudPaper Class="pa-4">
+                        <MudTextField @bind-Value="loginModel.username" Label="Benutzername"  Placeholder="Benutzername" Variant="Variant.Outlined"  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Person" AdornmentColor="Color.Primary"></MudTextField>
+                        <MudTextField Class="mt-8" @bind-Value="loginModel.password" Label="Passwort" Placeholder="Passwort" Variant="Variant.Outlined" InputType="InputType.Password"  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Lock" AdornmentColor="Color.Primary"></MudTextField>
+                    </MudPaper>
+                </MudCardContent>
+                    
+                <MudCardActions>
+                    <MudButton OnClick="ChangeFormPurpose" Variant="Variant.Text" Color="Color.Primary" Class="mt-4">@(registerNewUser ? "Zur Anmeldung" : "Benutzer anlegen")</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Text" Color="Color.Primary" Class="ml-auto mt-4">@(!registerNewUser ? "Anmelden" : "Registrieren")</MudButton>
+                </MudCardActions>
+            </MudCard>
+            </EditForm>
+            </MudContainer>
+
+@if(showError){
+    <MudAlert Severity="Severity.Error">Falscher Username oder Password</MudAlert>
+}
+
