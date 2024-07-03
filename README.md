@@ -34,7 +34,7 @@ Requirements for the software and other tools to build, test and push
 
 ## Authors
 
-  - Sebastian Christoph
+  - [Sebastian Christoph](https://github.com/SebastianChristoph)
   - Tom Donath
   - [Martin Wengenmayr](https://github.com/MartinWenge)
 
